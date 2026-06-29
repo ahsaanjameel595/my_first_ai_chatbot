@@ -2,8 +2,10 @@ from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 import streamlit as st
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
+hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 
 # ── Model (cached — ek baar load hoga) ──────────────────────────
 @st.cache_resource
@@ -13,6 +15,7 @@ def load_model():
         task="text-generation",
         max_new_tokens=512,
         provider="auto",
+        huggingfacehub_api_token=hf_token,  # ✅ yahan pass karo
     )
     return ChatHuggingFace(llm=llm)
 
@@ -47,7 +50,6 @@ if user_input:
     st.session_state.chat_history.append(HumanMessage(content=user_input))
     st.chat_message("user").write(user_input)
 
-    # System prompt + full history bhejo
     messages = [SystemMessage(content="You are a helpful assistant. Maintain context across the conversation.")] \
                + st.session_state.chat_history
 
